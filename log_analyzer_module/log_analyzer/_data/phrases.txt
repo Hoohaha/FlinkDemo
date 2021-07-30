@@ -1,0 +1,90 @@
+undefined symbol
+undefined reference to
+not defined
+not define
+redefined
+multiple definition
+no definition for
+enumeration value is out of
+identifier is undefined
+defined but not used
+not fit in region
+is undefined
+suggest parentheses around
+couldn't reserve space
+no return statement in function returning
+invalid operands to binary | (have 'int' and 'void *')
+unable to allocate space for sections/blocks with a total estimated minimum size
+with offset out of bounds
+error loading bundle activator
+no such file or directory
+cannot be found
+passing arg n of makes pointer from integer without a cast
+was unable to load
+exceeds the maximum allowed for
+cannot open source file
+cannot find source file
+cannot fit into
+not allowed
+not facet-valid with respect to pattern
+can not open
+pointless integer comparison, the result is always false
+cannot call
+cannot be assigned to
+cannot call intrinsic function
+a function call cannot appear in a constant-expression
+too few arguments in function call
+was not declared in this scope
+may be used uninitialized in this function
+interact script return value
+first use in this function
+duplicate definitions for
+function declared implicitly
+this instruction is not available in the selected cpu core
+has no field
+license check failed
+no definition for
+no module named num
+unexpected indent
+a value of type
+two or more data types in declaration specifiers
+abnormal end
+access denied
+critical error
+drop in
+drop out
+hard error
+hardware conflict
+invalid command
+illegal command
+illegal operation
+inherent error
+intermittent error
+overflow error
+cannot compile
+not found
+unknown escape sequence
+variable undeclared
+too few arguments to function
+implicit declaration
+parse error at end of input
+unterminated string or character constant
+character constant too long
+linker errors
+could not
+segmentation fault
+has no member named
+expression must have pointer type
+struct has no field
+redefinition of
+conflicting types
+no definition for
+unknown type
+unable to allocate space for sections/blocks with a total estimated minimum size
+command is error
+is used before its value is set
+no valid CPU defined
+overflowed with stack and heap
+no input files
+is not allowed
+dereferencing type-punned pointer will break strict-aliasing rules

@@ -1,0 +1,9 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /opt/data/*/*/station.log
+
+output.logstash:
+  hosts: ["logstash:5044"]
+  worker: 1

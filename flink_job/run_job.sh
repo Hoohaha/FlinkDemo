@@ -1,0 +1,1 @@
+flink run -py ./flink_demo.py -jar /opt/pravega-connectors-flink-1.11_2.12-0.9.1.jar
