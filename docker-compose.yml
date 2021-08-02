@@ -14,7 +14,6 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
     volumes:
-      - ./flink/pravega-connectors-flink-1.11_2.12-0.9.1.jar:/opt/pravega-connectors-flink-1.11_2.12-0.9.1.jar
       - ./flink_job:/opt/flink_job
 
   taskmanager:

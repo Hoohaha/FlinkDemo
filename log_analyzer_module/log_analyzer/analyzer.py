@@ -265,7 +265,7 @@ class Analyzer:
     def word_freq(self):
         counter = Counter(self.words)
         print(counter.most_common(100))
-
+a
 def brief_text(raw_text, patterns):
     for pa in patterns:
         raw_text = pa.sub("", raw_text)

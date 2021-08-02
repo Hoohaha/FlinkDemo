@@ -3,21 +3,18 @@ import os
 from pyflink import version
 print(version.__version__)
 
-print(os.path.abspath(os.path.dirname(pyflink.__file__)))
-if os.environ.get('https_proxy'):
-    del os.environ['https_proxy']
-if os.environ.get('http_proxy'):
-    del os.environ['http_proxy']
 
 from pyflink.common.typeinfo import Types
 from pyflink.table.table_environment import StreamTableEnvironment
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table.window import Tumble
+from pyflink.common.serialization import Encoder, SimpleStringEncoder
 from pyflink.table.expressions import lit
 from pyflink.table.udf import udf
 from pyflink.table import ScalarFunction, DataTypes
 from log_analyzer.analyzer import Analyzer
-
+from pyflink.table.expressions import col
+from pyflink.datastream.connectors import StreamingFileSink, OutputFileConfig
 
 # option 1: extending the base class `ScalarFunction`
 class Add(ScalarFunction):
@@ -50,7 +47,7 @@ t_env.create_temporary_function("ContainError", ContainError)
 t_env.create_temporary_function("add", add)
 
 # write all the data to one file
-t_env.get_config().get_configuration().set_string("pipeline.jars", "file:///opt/pravega-connectors-flink-1.11_2.12-0.9.1.jar")
+t_env.get_config().get_configuration().set_string("pipeline.jars", "file:///opt/flink_job/pravega-connectors-flink-1.12_2.12-0.10.0.jar")
 
 t_env.set_python_requirements(
     requirements_file_path="/opt/flink_job/requirements.txt",
@@ -60,8 +57,7 @@ URI = "tcp://pravega:9090"
 
 def create_table():
     return f"""CREATE TABLE source_table (
-    level STRING,
-    msg STRING,
+    message STRING,
     event_time TIMESTAMP(3),
     WATERMARK FOR event_time AS event_time - INTERVAL '10' SECONDS
 ) WITH (
@@ -76,15 +72,20 @@ def create_table():
 print(create_table())
 t_env.execute_sql(create_table())
 
-filter_sql = """SELECT msg FROM source_table
-WHERE add() > 0
-GROUP BY
-    msg,
-    TUMBLE(event_time, INTERVAL '10' SECOND)
+
+filter_sql = """SELECT message, ContainError(message)
+  FROM source_table
+ GROUP BY message, TUMBLE(event_time, INTERVAL '3' SECOND) HAVING ContainError(message) > 0.5
 """
 
 results = t_env.sql_query(filter_sql)
 
-t_env.to_append_stream(
-    results, Types.ROW_NAMED(['msg'], [Types.STRING()])).print()
+
+ds = t_env.to_append_stream(
+    results, Types.ROW_NAMED(['message', 'rate'], [Types.STRING(), Types.FLOAT()]))
+
+output_path ='/tmp/demooutput'
+file_sink = StreamingFileSink.for_row_format(output_path, SimpleStringEncoder()).build()
+ds.add_sink(file_sink)
+
 env.execute('Flink-Demo')
