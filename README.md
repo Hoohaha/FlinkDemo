@@ -1,7 +1,3 @@
-
-
-
-
 ## How to build
 
 - Configure Proxy in `.env` file, optional
@@ -11,7 +7,13 @@ http_proxy="http://xxxxx:8080"
 https_proxy="http://xxxxx:8080"
 ```
 
-- Build:
+- Build
+
+```
+.\build.sh
+```
+
+If you want to build image only, run:
 
 docker-compose --env-file .env build
 

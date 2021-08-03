@@ -27,6 +27,7 @@ log
 wwww
 xxx
 hard
+nxp
 have
 he
 her
@@ -99,7 +100,6 @@ please
 arm
 line
 slave
-iar
 cpu
 information
 list
@@ -118,7 +118,6 @@ entry
 system
 start
 ll
-elf
 source
 binary
 activator

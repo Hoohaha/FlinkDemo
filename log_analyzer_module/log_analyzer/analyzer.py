@@ -61,7 +61,7 @@ class Analyzer:
             self.classifier    = self.load_classifier()
         except IOError:
             pass
-        self.word_pattern = re.compile(r'^[a-z]{2,}$', re.I)
+        self.word_pattern = re.compile(r'^[a-z]{1,}$', re.I)
         self.words = []
         sub_regular = [
             r"(\d){4}(-\d\d){2}.*\d\d:\d\d:\d\d",
@@ -265,7 +265,7 @@ class Analyzer:
     def word_freq(self):
         counter = Counter(self.words)
         print(counter.most_common(100))
-a
+
 def brief_text(raw_text, patterns):
     for pa in patterns:
         raw_text = pa.sub("", raw_text)
