@@ -101,8 +101,9 @@ services:
     volumes:
       - ./Visualization/grafana-dashboard-provider.yaml:/etc/grafana/provisioning/dashboards/grafana-dashboard-provider.yaml
       - ./Visualization/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
-      - ./Visualization/dashboard-mysql.json:/var/lib/grafana/dashboards/dashboard-mysql.json
+      # - ./Visualization/dashboard-mysql.json:/var/lib/grafana/dashboards/dashboard-mysql.json
       - ./Visualization/dashboard-influxdb.json:/var/lib/grafana/dashboards/dashboard-influxdb.json
+      - ./Visualization/dashboard-sdkci.json:/var/lib/grafana/dashboards/dashboard-sdkci.json
     links:
       - mysql
       - influxDB
