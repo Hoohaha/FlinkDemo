@@ -23,7 +23,7 @@ services:
   input:
     image: elastic/filebeat:7.13.4
     volumes:
-      - "../55682/:/opt/data:ro"
+      - "./log-data/55682/:/opt/data:ro"
       - "./logstash/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
     links:
       - logstash
@@ -44,10 +44,13 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
     volumes:
-      - ./flink_job:/opt/flink_job
+      - ./flink_job:/opt/flink/job
       - ./cached:/opt/cached
     depends_on:
       - input
+      - mysql
+    links:
+      - mysql
 
   taskmanager:
     build:
@@ -64,3 +67,45 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 2
+        taskmanager.memory.framework.off-heap.size: 256mb
+  mysql:
+    image: mysql:8.0.19
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./mysql/55682-data.csv:/opt/55682-data.csv:ro
+      - ./mysql/mysql.cnf:/etc/mysql/conf.d/my.cnf
+      - ./mysql/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - ./mysql/privileges.sql:/docker-entrypoint-initdb.d/privileges.sql:ro
+
+  influxDB:
+    image: docker.io/influxdb:1.7.11
+    ports:
+      - 8083:8083
+      - 8086:8086
+    restart: always
+    environment:
+      INFLUXDB_DB: demo
+      INFLUXDB_HOST: influxdb
+      INFLUXDB_PASSWORD: root
+      INFLUXDB_USERNAME: root
+  grafana:
+    image: docker.io/grafana/grafana:latest
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: password
+    volumes:
+      - ./Visualization/grafana-dashboard-provider.yaml:/etc/grafana/provisioning/dashboards/grafana-dashboard-provider.yaml
+      - ./Visualization/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./Visualization/dashboard-mysql.json:/var/lib/grafana/dashboards/dashboard-mysql.json
+      - ./Visualization/dashboard-influxdb.json:/var/lib/grafana/dashboards/dashboard-influxdb.json
+    links:
+      - mysql
+      - influxDB
+    depends_on:
+      - influxDB
+      - mysql

@@ -38,17 +38,17 @@ ContainError = udf(ContainsErrorCl(), [DataTypes.STRING()], result_type=DataType
 t_env.create_temporary_function("ContainError", ContainError)
 
 # write all the data to one file
-t_env.get_config().get_configuration().set_string("pipeline.jars", "file:///opt/flink_job/pravega-connectors-flink-1.12_2.12-0.10.0.jar")
+t_env.get_config().get_configuration().set_string("pipeline.jars", "file:///opt/flink/lib/pravega-connectors-flink-1.12_2.12-0.10.0.jar")
 
 t_env.set_python_requirements(
-    requirements_file_path="/opt/flink_job/requirements.txt",
+    requirements_file_path="/opt/flink/job/requirements.txt",
     requirements_cache_dir="/opt/cached")
 
 URI = "tcp://pravega:9090"
 
 def create_table():
     return f"""CREATE TABLE source_table (
-    task_id INTEGER,
+    task_id BIGINT,
     task_hash BIGINT,
     log_type STRING,
     message STRING,
@@ -64,24 +64,51 @@ def create_table():
     'format' = 'json'
 )"""
 
+mysqlSink = """
+    CREATE TABLE mysqlsink (
+        task_id BIGINT,
+        task_hash BIGINT,
+        log_type STRING,
+        rate FLOAT,
+        message STRING
+    )
+    with (
+        'connector' = 'jdbc',
+        'url' = 'jdbc:mysql://mysql:3306/demo',
+        'username' = 'test',
+        'password' = '123456',
+        'table-name' = 'keyErrorLog'
+    )
+"""
+        # 'connector.write.flush.interval' = '5s',
+        # 'connector.write.flush.max-rows' = '1'
+#         # 'connector.driver' = 'com.mysql.cj.jdbc.Driver' ,
 print(create_table())
 t_env.execute_sql(create_table())
-
+t_env.execute_sql(mysqlSink)
 
 filter_sql = """SELECT task_id, task_hash, log_type, ContainError(message), message
   FROM source_table
- GROUP BY task_id, task_hash, message, log_type, TUMBLE(event_time, INTERVAL '10' SECOND) HAVING ContainError(message) > 0.6
+ GROUP BY task_id, task_hash, message, log_type, TUMBLE(event_time, INTERVAL '10' SECOND) HAVING ContainError(message) > 0.7
 """
 
-results = t_env.sql_query(filter_sql)
+t_env.sql_query(filter_sql).execute_insert("mysqlsink").wait()
 
-ds = t_env.to_append_stream(
-    results, Types.ROW_NAMED(
-        ["task_id", "task_hash", "log_type", 'rate', 'message'],
-        [ Types.INT(), Types.LONG(), Types.STRING(), Types.FLOAT(), Types.STRING()]))
+# ds = t_env.to_append_stream(
+#     results, Types.ROW_NAMED(
+#         ["task_id", "task_hash", "log_type", 'rate', 'message'],
+#         [ Types.LONG(), Types.LONG(), Types.STRING(), Types.FLOAT(), Types.STRING()]))
 
-output_path ='/tmp/DemoOut'
-file_sink = StreamingFileSink.for_row_format(output_path, SimpleStringEncoder()).build()
-ds.add_sink(file_sink)
+# t_env.from_data_stream(ds).execute_insert("mysqlsink")
+# table_result = table.execute_insert("my_sink")
+
+# sink = t_env.from_path('mysqlsink')
+
+# print(results)
+# ds.add_sink()
+
+# output_path ='/tmp/DemoOut'
+# file_sink = StreamingFileSink.for_row_format(output_path, SimpleStringEncoder()).build()
+# ds.add_sink(mysqlSink)
 
 env.execute('Flink-Demo')

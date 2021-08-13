@@ -1,0 +1,9 @@
+[client]
+loose-local-infile = 1
+
+[mysql]
+loose-local-infile = 1
+
+
+[mysqld]
+local-infile=1

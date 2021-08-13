@@ -1,30 +1,51 @@
 ## How to build
 
-- Configure Proxy in `.env` file, optional
+- Create file `.env` and configure Proxy like below, this is optional step:
 
 ```
 http_proxy="http://xxxxx:8080"
 https_proxy="http://xxxxx:8080"
 ```
 
-- Build
-
-```
-.\build.sh
-```
-
-If you want to build image only, run:
+- Build Images:
 
 docker-compose --env-file .env build
 
 ## Start services
 
+start containers:
+```
 docker-compose up -d
+```
+
+enter flink job manager
+```
+docker exec -it flink-demo_jobmanager_1 bash
+```
+
+submit flink job:
+
+```
+cd job
+./run_job.sh
+```
+
+
+## Shutdown services
+docker-compose down -v
 
 
 ## Restart services
 docker-compose restart
 
 
-## Shutdown services
-docker-compose down
+## Web dashboard
+
+- Flink Dashboard
+
+http://localhost:8081
+
+- Grafana Dashboard
+
+http://localhost:3000
+
