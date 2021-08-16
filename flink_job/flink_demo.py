@@ -92,7 +92,7 @@ filter_sql = """SELECT task_id, task_hash, log_type, ContainError(message), mess
  GROUP BY task_id, task_hash, message, log_type, TUMBLE(event_time, INTERVAL '10' SECOND) HAVING ContainError(message) > 0.7
 """
 
-t_env.sql_query(filter_sql).execute_insert("mysqlsink").wait()
+t_env.sql_query(filter_sql).execute_insert("mysqlsink")#.wait()
 
 # ds = t_env.to_append_stream(
 #     results, Types.ROW_NAMED(
@@ -111,4 +111,4 @@ t_env.sql_query(filter_sql).execute_insert("mysqlsink").wait()
 # file_sink = StreamingFileSink.for_row_format(output_path, SimpleStringEncoder()).build()
 # ds.add_sink(mysqlSink)
 
-env.execute('Flink-Demo')
+# env.execute('Flink-Demo')

@@ -104,9 +104,8 @@ class Analyzer:
             new_data[k] = v
 
         self.keywords = new_data.keys()
-        print("Features count: %s"%len(self.keywords))
+        print("Features count: %s" % len(self.keywords))
         new_data = OrderedDict(sorted(new_data.items(), key=lambda d:d[1], reverse = True))
-        # print new_data
         f = open('_data/wordfreq.pkl', 'wb')
         pickle.dump(new_data, f, 3)
         f.close()
@@ -129,7 +128,7 @@ class Analyzer:
         if debug:
             print(raw_text)
             print(document_words)
-
+        features['words_length'] = len(document_words) >= 3
         for word in document_words:
             features[word] = 1
 
@@ -234,8 +233,7 @@ class Analyzer:
                 phrase = 1
                 break
         else: phrase = 0
-        ws = 1 if len(document_words) > 1 else -1
-        return phrase*2 + prob*ws
+        return phrase*2 + prob - 0.5 ** len(document_words)
 
     def inspect_main(self, filepath, type="auto", brief=True):
         def _get_the_max(info):

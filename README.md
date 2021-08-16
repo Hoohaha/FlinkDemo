@@ -11,6 +11,17 @@ https_proxy="http://xxxxx:8080"
 
 docker-compose --env-file .env build
 
+## Prepare logs
+
+Unzip logs to `log-data/`:
+
+Examples:
+```
+log-data/
+  |_____ 197812/
+  |_____ 55682/
+```
+
 ## Start services
 
 start containers:

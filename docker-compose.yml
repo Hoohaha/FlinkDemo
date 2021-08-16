@@ -23,7 +23,8 @@ services:
   input:
     image: elastic/filebeat:7.13.4
     volumes:
-      - "./log-data/55682/:/opt/data:ro"
+      - "./log-data/55682/:/opt/data/55682:ro"
+      - "./log-data/197812/:/opt/data/197812:ro"
       - "./logstash/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
     links:
       - logstash
@@ -74,7 +75,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
     volumes:
-      - ./mysql/55682-data.csv:/opt/55682-data.csv:ro
+      - ./log-data/55682-data.csv:/opt/55682-data.csv:ro
+      - ./log-data/197812-data.csv:/opt/197812-data.csv:ro
       - ./mysql/mysql.cnf:/etc/mysql/conf.d/my.cnf
       - ./mysql/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
       - ./mysql/privileges.sql:/docker-entrypoint-initdb.d/privileges.sql:ro
@@ -102,7 +104,7 @@ services:
       - ./Visualization/grafana-dashboard-provider.yaml:/etc/grafana/provisioning/dashboards/grafana-dashboard-provider.yaml
       - ./Visualization/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
       # - ./Visualization/dashboard-mysql.json:/var/lib/grafana/dashboards/dashboard-mysql.json
-      - ./Visualization/dashboard-influxdb.json:/var/lib/grafana/dashboards/dashboard-influxdb.json
+      # - ./Visualization/dashboard-influxdb.json:/var/lib/grafana/dashboards/dashboard-influxdb.json
       - ./Visualization/dashboard-sdkci.json:/var/lib/grafana/dashboards/dashboard-sdkci.json
     links:
       - mysql
