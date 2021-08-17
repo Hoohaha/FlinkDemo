@@ -28,16 +28,22 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": []
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
         "overrides": [
           {
@@ -88,25 +94,18 @@
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 3,
+        "w": 7,
         "x": 0,
         "y": 0
       },
       "id": 10,
       "interval": "1h",
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "list",
-          "placement": "right",
-          "values": [
-            "value"
-          ]
-        },
-        "pieType": "pie",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -114,9 +113,8 @@
           "fields": "",
           "values": false
         },
-        "tooltip": {
-          "mode": "single"
-        }
+        "text": {},
+        "textMode": "auto"
       },
       "pluginVersion": "8.1.1",
       "targets": [
@@ -134,7 +132,7 @@
           "metricColumn": "buildresult",
           "queryType": "randomWalk",
           "rawQuery": true,
-          "rawSql": "SELECT\nNOW() as time,\nbuildresult AS metric,\ncount(task_id) AS value\nFROM Task\nGROUP BY 1,2\norder by 1",
+          "rawSql": "SELECT\nNOW() AS time,\nbuildresult AS metric,\ncount(task_id) AS value\nFROM Task\nwhere $__timeFilter(buildstart)\nGROUP BY 1, 2\norder by 1",
           "refId": "A",
           "select": [
             [
@@ -171,8 +169,214 @@
         }
       ],
       "timeShift": null,
-      "title": "Overal Results",
-      "type": "piechart"
+      "type": "stat"
+    },
+    {
+      "datasource": "mysql",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 1214
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cnt"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 682
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "target"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 113
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "testcase"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 192
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "platform"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 171
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "compiler"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 133
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "buildresult"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 135
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 7,
+        "x": 7,
+        "y": 0
+      },
+      "id": 13,
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Warning"
+          }
+        ]
+      },
+      "pluginVersion": "8.1.1",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "queryType": "randomWalk",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  category,\n  count(task_id) as \"Fail\"\nFROM Task\nwhere buildresult = \"Fail\" AND $__timeFilter(buildstart)\ngroup by 1\n\n",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "platform"
+                ],
+                "type": "column"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "platform"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "Task",
+          "timeColumn": "buildstart",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "format": "table",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  category,\n  count(task_id) as \"Warning\"\nFROM Task\nwhere buildresult = \"Warning\" AND $__timeFilter(buildstart)\ngroup by 1\n",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "task_id"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "Task",
+          "timeColumn": "buildstart",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Defects by SDK Category",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        }
+      ],
+      "type": "table"
     },
     {
       "datasource": "mysql",
@@ -213,13 +417,25 @@
                 "value": 591
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Defects"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 611
+              }
+            ]
           }
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
+        "h": 16,
+        "w": 10,
+        "x": 14,
         "y": 0
       },
       "id": 8,
@@ -243,7 +459,7 @@
           "metricColumn": "none",
           "queryType": "randomWalk",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  message AS \"Errors\",\r\n  rate,\r\n  task_hash,\r\n  count(message) AS \"cnt\"\r\nFROM keyErrorLog AS t1\r\nINNER JOIN (SELECT task_id, MAX(rate) FROM keyErrorLog GROUP by task_id) AS child ON (t1.task_id = child.task_id)\r\nwhere $__unixEpochFilter(task_hash/1000)\r\nGROUP BY 1, rate,task_hash\r\norder BY cnt desc\r\n\r\n",
+          "rawSql": "SELECT\r\n  DISTINCT(short_description) AS \"Defects\",\r\n  count(message) AS \"Count\"\r\nFROM keyErrorLog AS t1\r\nINNER JOIN (SELECT task_id, MAX(rate) FROM keyErrorLog GROUP by task_id) AS child ON (t1.task_id = child.task_id)\r\nwhere $__unixEpochFilter(task_hash/1000)\r\nGROUP BY 1\r\norder BY Count desc\r\n\r\n",
           "refId": "A",
           "select": [
             [
@@ -279,7 +495,7 @@
           ]
         }
       ],
-      "title": "Build Defects",
+      "title": "Defects Casuses",
       "transformations": [],
       "type": "table"
     },
@@ -318,7 +534,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "line"
+              "mode": "off"
             }
           },
           "mappings": [],
@@ -336,24 +552,40 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "defects"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2430c",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 9,
-        "w": 12,
+        "w": 7,
         "x": 0,
-        "y": 8
+        "y": 3
       },
       "id": 2,
       "interval": "1m",
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
+          "displayMode": "list",
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "multi"
         }
       },
       "targets": [
@@ -370,7 +602,7 @@
           ],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  $__timeGroupAlias(buildstart,\"1m\"),\n  count(task_id) AS \"building_taks\"\nFROM Task\nWHERE\n  $__timeFilter(buildstart)\nGROUP BY 1\nORDER BY $__timeGroup(buildstart,\"1m\")",
+          "rawSql": "SELECT\n  $__timeGroupAlias(buildstart,\"1m\", 0),\n  count(task_id) AS \"building_taks\"\nFROM Task\nWHERE\n  $__timeFilter(buildstart)\nGROUP BY 1\nORDER BY $__timeGroup(buildstart,\"1m\", 0)",
           "refId": "A",
           "select": [
             [
@@ -404,9 +636,38 @@
               "type": "macro"
             }
           ]
+        },
+        {
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  $__timeGroupAlias(buildstart,\"1m\", 0),\n  count(task_id) AS \"defects\"\nFROM Task\nWHERE\n  $__timeFilter(buildstart) AND buildresult != \"Pass\"\nGROUP BY 1\nORDER BY $__timeGroup(buildstart,\"1m\", 0)",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "task_id"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "Task",
+          "timeColumn": "buildstart",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
         }
       ],
-      "title": "Build Peformance (Per Minutes)",
+      "title": "Build Progress",
       "type": "timeseries"
     },
     {
@@ -464,10 +725,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 8
+        "h": 11,
+        "w": 7,
+        "x": 0,
+        "y": 12
       },
       "id": 4,
       "interval": "2s",
@@ -550,7 +811,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Compiler build time line",
+      "title": "Build Time Line by Toolchain",
       "transformations": [
         {
           "id": "groupBy",
@@ -594,27 +855,94 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 331
+                "value": 1214
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cnt"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 682
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "target"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 113
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "testcase"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 192
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "platform"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 171
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "compiler"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 133
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "buildresult"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 135
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
+        "h": 7,
+        "w": 17,
+        "x": 7,
         "y": 16
       },
       "id": 12,
       "options": {
         "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "cnt"
-          }
-        ]
+        "sortBy": []
       },
       "pluginVersion": "8.1.1",
       "targets": [
@@ -624,7 +952,7 @@
           "metricColumn": "none",
           "queryType": "randomWalk",
           "rawQuery": true,
-          "rawSql": "SELECT\n  testcase,\n  platform,\n  keyErrorLog.message,\n  count(Task.task_id) AS cnt\nFROM Task\nINNER JOIN keyErrorLog ON keyErrorLog.task_id = Task.task_id\nwhere Task.buildresult=\"Fail\"\ngroup by testcase, platform, keyErrorLog.message\n\n\n",
+          "rawSql": "SELECT\n  testcase,\n  platform,\n  compiler,\n  target,\n  buildresult,\n  keyErrorLog.message as \"error\"\nFROM Task\nINNER JOIN keyErrorLog ON keyErrorLog.task_id = Task.task_id\nwhere buildresult != \"Pass\" AND $__timeFilter(buildstart)\n\n\n",
           "refId": "A",
           "select": [
             [
@@ -656,7 +984,7 @@
           ]
         }
       ],
-      "title": "Build Errors",
+      "title": "Details List",
       "transformations": [
         {
           "id": "concatenate",
@@ -674,8 +1002,8 @@
     "list": []
   },
   "time": {
-    "from": "now/y",
-    "to": "now"
+    "from": "2021-04-17T16:00:00.500Z",
+    "to": "2021-04-19T15:59:59.500Z"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -691,7 +1019,7 @@
       "1d"
     ]
   },
-  "timezone": "",
+  "timezone": "browser",
   "title": "SDK_CI_Dashboard",
   "uid": "iDVMAknnz",
   "version": 1

@@ -26,7 +26,8 @@ CREATE TABLE `keyErrorLog` (
   `task_hash` bigint(40) DEFAULT NULL,
   `log_type` varchar(255) DEFAULT "",
   `rate` float,
-  `message` TEXT DEFAULT NULL
+  `message` TEXT DEFAULT NULL,
+  `short_description` TEXT DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 

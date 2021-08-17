@@ -1,7 +1,7 @@
 import os
 import pyflink
 from pyflink import version
-
+import logging
 
 from pyflink.common.typeinfo import Types
 from pyflink.table.table_environment import StreamTableEnvironment
@@ -11,18 +11,18 @@ from pyflink.common.serialization import Encoder, SimpleStringEncoder
 from pyflink.table.expressions import lit
 from pyflink.table.udf import udf
 from pyflink.table import ScalarFunction, DataTypes
-from log_analyzer.analyzer import Analyzer
 from pyflink.table.expressions import col
 from pyflink.datastream.connectors import StreamingFileSink, OutputFileConfig
-
+from log_analyzer.analyzer import Analyzer
+from log_analyzer.cluster import refactor_string
 
 print(version.__version__)
 
-class ContainsErrorCl(ScalarFunction):
+class ClassifyCl(ScalarFunction):
     def __init__(self):
         self.analyzer = Analyzer()
     def eval(self, input):
-        import logging
+
         if input is None:
             return False
 
@@ -30,12 +30,20 @@ class ContainsErrorCl(ScalarFunction):
         logging.info("%s    %s", rate, input)
         return rate
 
+class SimplifyStringCl(ScalarFunction):
+
+    def eval(self, input):
+        return refactor_string(input)
+
 print("start demo")
 env = StreamExecutionEnvironment.get_execution_environment()
 t_env = StreamTableEnvironment.create(stream_execution_environment=env)
 
-ContainError = udf(ContainsErrorCl(), [DataTypes.STRING()], result_type=DataTypes.FLOAT())
-t_env.create_temporary_function("ContainError", ContainError)
+Classify = udf(ClassifyCl(), [DataTypes.STRING()], result_type=DataTypes.FLOAT())
+SimplifyString = udf(SimplifyStringCl(), [DataTypes.STRING()], result_type=DataTypes.STRING())
+
+t_env.create_temporary_function("Classify", Classify)
+t_env.create_temporary_function("SimplifyString", SimplifyString)
 
 # write all the data to one file
 t_env.get_config().get_configuration().set_string("pipeline.jars", "file:///opt/flink/lib/pravega-connectors-flink-1.12_2.12-0.10.0.jar")
@@ -70,7 +78,8 @@ mysqlSink = """
         task_hash BIGINT,
         log_type STRING,
         rate FLOAT,
-        message STRING
+        message STRING,
+        short_description STRING
     )
     with (
         'connector' = 'jdbc',
@@ -80,35 +89,14 @@ mysqlSink = """
         'table-name' = 'keyErrorLog'
     )
 """
-        # 'connector.write.flush.interval' = '5s',
-        # 'connector.write.flush.max-rows' = '1'
-#         # 'connector.driver' = 'com.mysql.cj.jdbc.Driver' ,
+
 print(create_table())
 t_env.execute_sql(create_table())
 t_env.execute_sql(mysqlSink)
 
-filter_sql = """SELECT task_id, task_hash, log_type, ContainError(message), message
+filter_sql = """SELECT task_id, task_hash, log_type, Classify(message), message, SimplifyString(message)
   FROM source_table
- GROUP BY task_id, task_hash, message, log_type, TUMBLE(event_time, INTERVAL '10' SECOND) HAVING ContainError(message) > 0.7
+ GROUP BY task_id, task_hash, message, log_type, TUMBLE(event_time, INTERVAL '10' SECOND) HAVING Classify(message) > 0.75
 """
 
-t_env.sql_query(filter_sql).execute_insert("mysqlsink")#.wait()
-
-# ds = t_env.to_append_stream(
-#     results, Types.ROW_NAMED(
-#         ["task_id", "task_hash", "log_type", 'rate', 'message'],
-#         [ Types.LONG(), Types.LONG(), Types.STRING(), Types.FLOAT(), Types.STRING()]))
-
-# t_env.from_data_stream(ds).execute_insert("mysqlsink")
-# table_result = table.execute_insert("my_sink")
-
-# sink = t_env.from_path('mysqlsink')
-
-# print(results)
-# ds.add_sink()
-
-# output_path ='/tmp/DemoOut'
-# file_sink = StreamingFileSink.for_row_format(output_path, SimpleStringEncoder()).build()
-# ds.add_sink(mysqlSink)
-
-# env.execute('Flink-Demo')
+t_env.sql_query(filter_sql).execute_insert("mysqlsink")

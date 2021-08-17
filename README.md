@@ -29,16 +29,10 @@ start containers:
 docker-compose up -d
 ```
 
-enter flink job manager
-```
-docker exec -it flink-demo_jobmanager_1 bash
-```
-
 submit flink job:
 
 ```
-cd job
-./run_job.sh
+docker exec -it flinkdemo_jobmanager_1 bash -c "cd job;./run_job.sh"
 ```
 
 
