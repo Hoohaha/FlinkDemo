@@ -81,17 +81,17 @@ services:
       - ./mysql/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
       - ./mysql/privileges.sql:/docker-entrypoint-initdb.d/privileges.sql:ro
 
-  influxDB:
-    image: docker.io/influxdb:1.7.11
-    ports:
-      - 8083:8083
-      - 8086:8086
-    restart: always
-    environment:
-      INFLUXDB_DB: demo
-      INFLUXDB_HOST: influxdb
-      INFLUXDB_PASSWORD: root
-      INFLUXDB_USERNAME: root
+  # influxDB:
+  #   image: docker.io/influxdb:1.7.11
+  #   ports:
+  #     - 8083:8083
+  #     - 8086:8086
+  #   restart: always
+  #   environment:
+  #     INFLUXDB_DB: demo
+  #     INFLUXDB_HOST: influxdb
+  #     INFLUXDB_PASSWORD: root
+  #     INFLUXDB_USERNAME: root
   grafana:
     image: docker.io/grafana/grafana:latest
     restart: always
@@ -108,7 +108,5 @@ services:
       - ./Visualization/dashboard-sdkci.json:/var/lib/grafana/dashboards/dashboard-sdkci.json
     links:
       - mysql
-      - influxDB
     depends_on:
-      - influxDB
       - mysql

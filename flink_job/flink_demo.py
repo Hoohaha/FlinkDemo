@@ -94,7 +94,7 @@ print(create_table())
 t_env.execute_sql(create_table())
 t_env.execute_sql(mysqlSink)
 
-filter_sql = """SELECT task_id, task_hash, log_type, Classify(message), message, SimplifyString(message)
+filter_sql = """SELECT task_id, task_hash, log_type, MAX(Classify(message)), message, SimplifyString(message)
   FROM source_table
  GROUP BY task_id, task_hash, message, log_type, TUMBLE(event_time, INTERVAL '10' SECOND) HAVING Classify(message) > 0.75
 """

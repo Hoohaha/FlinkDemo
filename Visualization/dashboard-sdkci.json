@@ -93,12 +93,6 @@
           }
         ]
       },
-      "gridPos": {
-        "h": 3,
-        "w": 7,
-        "x": 0,
-        "y": 0
-      },
       "id": 10,
       "interval": "1h",
       "options": {
@@ -176,12 +170,22 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
           },
           "custom": {
-            "align": "auto",
-            "displayMode": "auto"
+            "axisLabel": "Count",
+            "axisPlacement": "left",
+            "axisSoftMin": 0,
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1
           },
+          "decimals": 0,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -201,84 +205,15 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "message"
+              "options": "Fail"
             },
             "properties": [
               {
-                "id": "custom.width",
-                "value": 1214
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "cnt"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 682
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "target"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 113
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "testcase"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 192
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "platform"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 171
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "compiler"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 133
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "buildresult"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 135
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
               }
             ]
           }
@@ -286,19 +221,26 @@
       },
       "gridPos": {
         "h": 16,
-        "w": 7,
-        "x": 7,
+        "w": 6,
+        "x": 6,
         "y": 0
       },
       "id": 13,
       "options": {
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "Warning"
-          }
-        ]
+        "barWidth": 0.95,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "orientation": "horizontal",
+        "showValue": "always",
+        "stacking": "normal",
+        "text": {},
+        "tooltip": {
+          "mode": "single"
+        }
       },
       "pluginVersion": "8.1.1",
       "targets": [
@@ -308,7 +250,7 @@
           "metricColumn": "none",
           "queryType": "randomWalk",
           "rawQuery": true,
-          "rawSql": "SELECT\n  category,\n  count(task_id) as \"Fail\"\nFROM Task\nwhere buildresult = \"Fail\" AND $__timeFilter(buildstart)\ngroup by 1\n\n",
+          "rawSql": "SELECT\n  category,\n  count(task_id) as \"Fail\"\nFROM Task\nwhere buildresult = \"Fail\" AND $__timeFilter(buildstart)\ngroup by 1\norder by 1\n\n",
           "refId": "A",
           "select": [
             [
@@ -345,7 +287,7 @@
           "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  category,\n  count(task_id) as \"Warning\"\nFROM Task\nwhere buildresult = \"Warning\" AND $__timeFilter(buildstart)\ngroup by 1\n",
+          "rawSql": "SELECT\n  category,\n  count(task_id) as \"Warning\"\nFROM Task\nwhere buildresult = \"Warning\" AND $__timeFilter(buildstart)\ngroup by 1\norder by 1\n",
           "refId": "B",
           "select": [
             [
@@ -374,9 +316,226 @@
         {
           "id": "merge",
           "options": {}
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": true,
+                "field": "Fail"
+              }
+            ]
+          }
         }
       ],
-      "type": "table"
+      "type": "barchart"
+    },
+    {
+      "datasource": "mysql",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0,
+            "axisWidth": -2,
+            "fillOpacity": 74,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 0
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Fail"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 5,
+        "x": 12,
+        "y": 0
+      },
+      "id": 15,
+      "options": {
+        "barWidth": 0.79,
+        "groupWidth": 0.56,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "normal",
+        "text": {},
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "8.1.1",
+      "targets": [
+        {
+          "format": "table",
+          "group": [
+            {
+              "params": [
+                "$__interval",
+                "none"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "platform"
+              ],
+              "type": "column"
+            }
+          ],
+          "metricColumn": "none",
+          "queryType": "randomWalk",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  platform,\n  count(buildresult) AS \"Fail\"\nFROM Task\nWHERE\n  $__timeFilter(buildstart) AND buildresult = \"Fail\"\nGROUP BY platform",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "platform"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "avg"
+                ],
+                "type": "aggregate"
+              },
+              {
+                "params": [
+                  "platform"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "buildresult"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "count"
+                ],
+                "type": "aggregate"
+              },
+              {
+                "params": [
+                  "buildresult"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "table": "Task",
+          "timeColumn": "buildstart",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "format": "table",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  platform,\n  count(buildresult) AS \"Warning\"\nFROM Task\nWHERE\n  $__timeFilter(buildstart) AND buildresult = \"Warning\"\nGROUP BY platform",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "task_id"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "Task",
+          "timeColumn": "buildstart",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Defects by Platform",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": true,
+                "field": "Fail"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "barchart"
     },
     {
       "datasource": "mysql",
@@ -426,7 +585,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 611
+                "value": 388
               }
             ]
           }
@@ -434,14 +593,19 @@
       },
       "gridPos": {
         "h": 16,
-        "w": 10,
-        "x": 14,
+        "w": 7,
+        "x": 17,
         "y": 0
       },
       "id": 8,
       "options": {
         "showHeader": true,
-        "sortBy": []
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Count"
+          }
+        ]
       },
       "pluginVersion": "8.1.1",
       "targets": [
@@ -495,7 +659,7 @@
           ]
         }
       ],
-      "title": "Defects Casuses",
+      "title": "Detected Defects",
       "transformations": [],
       "type": "table"
     },
@@ -510,7 +674,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "drawStyle": "line",
+            "drawStyle": "bars",
             "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
@@ -571,8 +735,8 @@
         ]
       },
       "gridPos": {
-        "h": 9,
-        "w": 7,
+        "h": 7,
+        "w": 6,
         "x": 0,
         "y": 3
       },
@@ -725,10 +889,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 11,
-        "w": 7,
+        "h": 8,
+        "w": 6,
         "x": 0,
-        "y": 12
+        "y": 10
       },
       "id": 4,
       "interval": "2s",
@@ -740,7 +904,7 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "multi"
         }
       },
       "pluginVersion": "8.1.1",
@@ -903,7 +1067,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 171
+                "value": 139
               }
             ]
           },
@@ -934,9 +1098,9 @@
         ]
       },
       "gridPos": {
-        "h": 7,
-        "w": 17,
-        "x": 7,
+        "h": 9,
+        "w": 18,
+        "x": 6,
         "y": 16
       },
       "id": 12,
@@ -992,6 +1156,167 @@
         }
       ],
       "type": "table"
+    },
+    {
+      "datasource": "mysql",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0,
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "buildduration"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 0,
+        "y": 18
+      },
+      "id": 17,
+      "options": {
+        "barWidth": 0.97,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "hidden",
+          "placement": "bottom"
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "text": {},
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "8.1.1",
+      "targets": [
+        {
+          "format": "table",
+          "group": [
+            {
+              "params": [
+                "$__interval",
+                "none"
+              ],
+              "type": "time"
+            }
+          ],
+          "metricColumn": "none",
+          "queryType": "randomWalk",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  compiler,\n  avg(buildduration) AS \"buildduration\"\nFROM Task\nWHERE\n  $__timeFilter(buildstart)\nGROUP BY compiler\norder by buildduration",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "buildduration"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "avg"
+                ],
+                "type": "aggregate"
+              },
+              {
+                "params": [
+                  "buildduration"
+                ],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "compiler"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "avg"
+                ],
+                "type": "aggregate"
+              },
+              {
+                "params": [
+                  "buildduration"
+                ],
+                "type": "alias"
+              }
+            ]
+          ],
+          "table": "Task",
+          "timeColumn": "buildstart",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Average Build Duration",
+      "type": "barchart"
     }
   ],
   "refresh": false,
@@ -1002,8 +1327,8 @@
     "list": []
   },
   "time": {
-    "from": "2021-04-17T16:00:00.500Z",
-    "to": "2021-04-19T15:59:59.500Z"
+    "from": "2021-08-15T11:25:31.610Z",
+    "to": "2021-08-15T17:33:48.318Z"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -1022,5 +1347,5 @@
   "timezone": "browser",
   "title": "SDK_CI_Dashboard",
   "uid": "iDVMAknnz",
-  "version": 1
+  "version": 8
 }
